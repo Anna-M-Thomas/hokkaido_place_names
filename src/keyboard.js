@@ -52,7 +52,7 @@ function setupKeyboard(sprite) {
   const up = keyboard('i')
   const down = keyboard('k')
 
-  const speed = .8
+  const speed = 1
 
   function stopMovingHorizontal() {
     sprite.vx = 0;

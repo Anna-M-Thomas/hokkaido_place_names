@@ -1,0 +1,26 @@
+{
+  "name": "hokkaido_place_names",
+  "version": "1.0.0",
+  "description": "I am the readme.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --progress --mode=production",
+    "serve": "webpack serve"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pixi/utils": "^7.4.2",
+    "leaflet": "^1.9.4",
+    "leaflet-pixi-overlay": "^1.9.4",
+    "pixi.js": "^7.4.2"
+  },
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0"
+  }
+}

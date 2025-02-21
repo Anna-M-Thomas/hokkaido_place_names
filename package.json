@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@pixi/utils": "^7.4.2",
+    "alpinejs": "^3.14.8",
     "leaflet": "^1.9.4",
     "leaflet-pixi-overlay": "^1.9.4",
     "pixi.js": "^7.4.2"

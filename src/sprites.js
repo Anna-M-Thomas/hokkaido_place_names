@@ -1,8 +1,10 @@
 import { Assets, Sprite, Text} from 'pixi.js'
 import cityData from '../city_data.json'
+import './store.js'
+import Alpine from 'alpinejs'
 
 class Sprites {
-    constructor(container){
+    constructor(container, score, health){        
         this.container = container;
         this.bird = null;
         this.cities = [];
@@ -29,10 +31,7 @@ class Sprites {
           cityText.data = city
           cityText.interactive = true
           cityText.cursor = 'pointer';
-          function onClick(){
-            console.log("'clicked!")
-          }
-          cityText.on('pointerdown', onClick)
+          cityText.on('pointerdown', () => Alpine.store('UI').askQuestion(city.city_name, city.pron))
           this.container.addChild(cityText)
           this.cities.push(cityText)
         })

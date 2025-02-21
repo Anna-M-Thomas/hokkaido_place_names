@@ -3,6 +3,9 @@ import { Application, Ticker } from 'pixi.js'
 import 'leaflet-pixi-overlay'
 import { setupKeyboard } from './keyboard'
 import { Sprites } from './sprites.js'
+import { Health, Score } from './score.js'
+import './store.js'
+import Alpine from 'alpinejs'
 
 const startLatLng = [43.11, 141.45]
 
@@ -24,8 +27,11 @@ L.tileLayer(
 const app = new Application()
 let firstDraw = true
 app.stage.sortableChildren = true
-
-const sprites = new Sprites(app.stage)
+const score = new Score(0);
+const health = new Health(50);
+Alpine.store('UI').score = score;
+Alpine.store('UI').health = health;
+const sprites = new Sprites(app.stage, score, health)
 await sprites.initialize()
 const bird = sprites.bird
 const cities = sprites.cities

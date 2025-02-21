@@ -10,7 +10,7 @@ import Alpine from 'alpinejs'
 const startLatLng = [43.11, 141.45]
 
 //Making the map
-const mymap = L.map('mapid').setView(startLatLng, 11)
+let mymap = L.map('mapid', { doubleClickZoom: false, keyboard: false }).setView(startLatLng, 11)
 L.tileLayer(
   'https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}{r}.png',
   {

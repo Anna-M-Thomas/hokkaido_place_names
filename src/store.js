@@ -5,7 +5,7 @@ Alpine.store('UI', {
   resultWindow: false,
   cityName: '',
   cityPron: '',
-  answer: '--',
+  answer: '',
   correct: false,
   score: null,
   health: null,
@@ -19,7 +19,7 @@ Alpine.store('UI', {
     } else {
       this.health.decrement()
     }
-
+    this.answer = ''
     this.resultWindow = true
   },
   askQuestion(name, pron) {

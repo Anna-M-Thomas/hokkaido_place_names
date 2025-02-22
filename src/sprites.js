@@ -6,14 +6,14 @@ import birdImage from './img/bird_hato.png'
 
 class Sprites {
     constructor(container){        
-        this.container = container;
+        this.container = container
         this.bird = null;
         this.cities = [];
     }
 
     async initialize(){
-        await this.createBird();
-        await this.createCities();
+        await this.createBird()
+        await this.createCities()
     }
 
     async createBird(){
@@ -31,8 +31,7 @@ class Sprites {
           cityText.anchor.set(0.5, 0.5)
           cityText.data = city
           cityText.interactive = true
-          cityText.cursor = 'pointer';
-          cityText.on('pointerdown', () => Alpine.store('UI').askQuestion(city.city_name, city.pron))
+          cityText.cursor = 'pointer'
           this.container.addChild(cityText)
           this.cities.push(cityText)
         })

@@ -59,7 +59,7 @@
       </div>
       <div class="window ui" x-show="$store.UI.questionWindow" x-cloak>
         <span role="button" class="close-button" @click="$store.UI.questionWindow = false;">X</span>
-        <p><span x-text="$store.UI.cityName"></span>の発音は？</p>
+        <p><span x-text="$store.UI.name"></span>の発音は？</p>
         <input type="text" placeholder="ひらがなで答えてください" x-model="$store.UI.answer" >
         <button @click="$store.UI.checkAnswer()">答える</button>
       </div>
@@ -67,7 +67,7 @@
         <span role="button" class="close-button" @click="$store.UI.resultWindow = false">X</span>
         <p>
           <span x-text="$store.UI.correct ? '正解！' : '残念！'"></span><br/>
-          <span x-text="$store.UI.cityName"></span>の発音は<span x-text="$store.UI.cityPron"></span>!
+          <span x-text="$store.UI.name"></span>の発音は<span x-text="$store.UI.pron"></span>!
         </p>
       </div>
     </div>

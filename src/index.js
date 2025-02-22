@@ -47,6 +47,12 @@ const pixiOverlay = L.pixiOverlay(function (utils, event) {
     map.panTo(newCoords)
   }
 
+  // Change city's color and remove interactivity when it was correctly answered
+  if(event.type == 'correct_city'){
+    event.city.style.fill = "#87CEEB"
+    event.city.interactive = false
+  }
+
   // Place bird and city names on map
   if (firstDraw) {
     const project = utils.latLngToLayerPoint
@@ -64,6 +70,7 @@ const pixiOverlay = L.pixiOverlay(function (utils, event) {
     })
     firstDraw = false
   }
+  
   renderer.render(container)
 }, app.stage) 
 
@@ -72,6 +79,12 @@ pixiOverlay.addTo(mymap)
 
 // Set up keyboard
 setupKeyboard(sprites.bird)
+
+// Event listeners for the city
+// Changing text color, content does not work correctly  without calling pixiOverlay redraw
+cities.forEach(city => {
+  city.on('pointerdown', (event) => Alpine.store('UI').askQuestion(event.target, pixiOverlay))
+})
 
 // Start the game loop
 Ticker.shared.add(delta => gameLoop(delta))

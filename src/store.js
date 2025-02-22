@@ -4,8 +4,10 @@ import { Health, Score } from './health.js'
 Alpine.store('UI', {
   questionWindow: false,
   resultWindow: false,
-  cityName: '',
-  cityPron: '',
+  pixiOverlay: null,
+  city: null,
+  name: "",
+  pron: "",
   answer: '',
   correct: false,
   score:  new Score(0),
@@ -13,20 +15,24 @@ Alpine.store('UI', {
   checkAnswer() {
     this.correct = false
     this.questionWindow = false
-    if (this.answer == this.cityPron) {
+    if (this.answer == this.pron) {
       this.correct = true
       this.score.increment()
       this.health.increment()
+      this.pixiOverlay.redraw({type: "correct_city", city: this.city})
     } else {
       this.health.decrement()
     }
     this.answer = ''
     this.resultWindow = true
   },
-  askQuestion(name, pron) {
+  askQuestion(city, pixiOverlay) {
+    this.pixiOverlay = pixiOverlay
     this.questionWindow = true
-    this.cityName = name
-    this.cityPron = pron
+    // I know this is くどい to save all of these but it's easier to write out in index.html and in here
+    this.city = city
+    this.name = city.data.city_name
+    this.pron = city.data.pron
   },
 })
 

@@ -1,7 +1,7 @@
 import * as L from 'leaflet'
 import { Application, Ticker } from 'pixi.js'
 import 'leaflet-pixi-overlay'
-import { setupKeyboard } from './keyboard'
+import { setupKeyboard } from './setupKeyboard.js'
 import { Sprites } from './sprites.js'
 import './store.js'
 import Alpine from 'alpinejs'

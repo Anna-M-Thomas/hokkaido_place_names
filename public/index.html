@@ -14,36 +14,57 @@
         height: 500px;
         width: 700px;
       }
-      .window {
-        padding: 1.2em 1.2em;
+      .ui {
+        border: 2px solid rgba(0,0,0,0.2);
         font-size: 1rem;
         background: white;
-        border-radius: 10px;
+        z-index: 1000;
+        text-align: center;
+      }
+      .window {
+        padding: 1.2em;
         max-width: 40%;
         position: relative;
         z-index: 1000;
         margin: 0 auto;
         top: 20%;
-        text-align: center;
       }
       .close-button {
         position: absolute;
         right: 20px;
         cursor: pointer;
       }
+      .top-bar {
+        padding: 1em;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+      }
+      [x-cloak] {
+        display: none !important; 
+      }
     </style>
   </head>
 
   <body>
     <div x-data id="mapid">
-      <div class=window x-show="$store.UI.questionWindow">
+      <div class="top-bar ui">
+        <div x-show="$store.UI.health.value >= 0">
+        &#128151; <span x-text="$store.UI.health.value"></span><br/>
+        スコア: <span x-text="$store.UI.score.value"></span>
+        </div>
+        <div x-show="$store.UI.health.value < 0">
+          GAME OVER
+        </div>
+      </div>
+      <div class="window ui" x-show="$store.UI.questionWindow" x-cloak>
         <span role="button" class="close-button" @click="$store.UI.questionWindow = false;">X</span>
         <p><span x-text="$store.UI.cityName"></span>の発音は？</p>
         <input type="text" placeholder="ひらがなで答えてください" x-model="$store.UI.answer" >
         <button @click="$store.UI.checkAnswer()">答える</button>
       </div>
-      <div class=window x-data x-show="$store.UI.resultWindow">
-        <span role="button" class="close-button" @click="$store.UI.resultWindow = false;">X</span>
+      <div class="window ui" x-data x-show="$store.UI.resultWindow" x-cloak>
+        <span role="button" class="close-button" @click="$store.UI.resultWindow = false">X</span>
         <p>
           <span x-text="$store.UI.correct ? '正解！' : '残念！'"></span><br/>
           <span x-text="$store.UI.cityName"></span>の発音は<span x-text="$store.UI.cityPron"></span>!

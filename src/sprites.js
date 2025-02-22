@@ -2,6 +2,7 @@ import { Assets, Sprite, Text} from 'pixi.js'
 import cityData from '../city_data.json'
 import './store.js'
 import Alpine from 'alpinejs'
+import birdImage from './img/bird_hato.png'
 
 class Sprites {
     constructor(container){        
@@ -16,7 +17,7 @@ class Sprites {
     }
 
     async createBird(){
-        const birdTexture = await Assets.load('img/bird_hato.png')
+        const birdTexture = await Assets.load(birdImage)
         const bird = Sprite.from(birdTexture)
         bird.anchor.set(0.5, 0.5)
         bird.zIndex = 1

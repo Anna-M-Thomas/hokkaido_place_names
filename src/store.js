@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs'
+import { Health, Score } from './health.js'
 
 Alpine.store('UI', {
   questionWindow: false,
@@ -7,8 +8,8 @@ Alpine.store('UI', {
   cityPron: '',
   answer: '',
   correct: false,
-  score: null,
-  health: null,
+  score:  new Score(0),
+  health: new Health(10),
   checkAnswer() {
     this.correct = false
     this.questionWindow = false

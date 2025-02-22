@@ -4,7 +4,7 @@ import './store.js'
 import Alpine from 'alpinejs'
 
 class Sprites {
-    constructor(container, score, health){        
+    constructor(container){        
         this.container = container;
         this.bird = null;
         this.cities = [];

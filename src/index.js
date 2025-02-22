@@ -3,14 +3,14 @@ import { Application, Ticker } from 'pixi.js'
 import 'leaflet-pixi-overlay'
 import { setupKeyboard } from './keyboard'
 import { Sprites } from './sprites.js'
-import { Health, Score } from './score.js'
 import './store.js'
 import Alpine from 'alpinejs'
 
+// 岩見沢市の位置
 const startLatLng = [43.11, 141.45]
 
-//Making the map
-let mymap = L.map('mapid', { doubleClickZoom: false, keyboard: false }).setView(startLatLng, 11)
+//　Making the map
+const mymap = L.map('mapid', { doubleClickZoom: false, keyboard: false }).setView(startLatLng, 11)
 L.tileLayer(
   'https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}{r}.png',
   {
@@ -27,16 +27,15 @@ L.tileLayer(
 const app = new Application()
 let firstDraw = true
 app.stage.sortableChildren = true
-const score = new Score(0);
-const health = new Health(50);
-Alpine.store('UI').score = score;
-Alpine.store('UI').health = health;
-const sprites = new Sprites(app.stage, score, health)
+
+const sprites = new Sprites(app.stage)
 await sprites.initialize()
 const bird = sprites.bird
 const cities = sprites.cities
 
-// Making pixi overlay from stage
+// Making pixi overlay
+// There's an option called "showRedrawOnMove" that redraws the pixi layer if the map moves
+// I'm not using because I want redraw to trigger when the bird moves, and the map to follow the bird
 const pixiOverlay = L.pixiOverlay(function (utils, event) {
   const container = utils.getContainer()
   const renderer = utils.getRenderer()
@@ -66,7 +65,7 @@ const pixiOverlay = L.pixiOverlay(function (utils, event) {
     firstDraw = false
   }
   renderer.render(container)
-}, app.stage)
+}, app.stage) 
 
 //Put pixi overlay on map
 pixiOverlay.addTo(mymap)
@@ -77,7 +76,7 @@ setupKeyboard(sprites.bird)
 // Start the game loop
 Ticker.shared.add(delta => gameLoop(delta))
 
-//Update the current game state
+//　Update the current game state
 function gameLoop(delta) {
   play(delta)
 }
@@ -85,12 +84,15 @@ function gameLoop(delta) {
 function play() {
   const previousX = bird.x
   const previousY = bird.y
-  // Use the bird's velocity to make it move
   bird.x += bird.vx
   bird.y += bird.vy
 
+  if(Alpine.store('UI').health.isNegativeHealth()){
+    pixiOverlay.destroy();
+  }
+
   if (previousX != bird.x || previousY != bird.y) {
-    // Redraw pixi overlay if moved
+    // Redraw pixi overlay and move map if bird moved
     pixiOverlay.redraw({ type: 'move' })
   }
 }

@@ -38,6 +38,15 @@ function setupKeyboard(sprite) {
   
   left.release = right.release = stopMovingHorizontal;
   up.release = down.release = stopMovingVertical;
+
+  function unsubscribeAll() {
+    left.unsubscribe();
+    up.unsubscribe();
+    right.unsubscribe();
+    down.unsubscribe();
+  }
+
+  return { unsubscribeAll }
 }
 
-export { setupKeyboard }
+export { setupKeyboard } 

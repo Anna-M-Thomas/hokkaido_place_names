@@ -1,7 +1,5 @@
-import { Assets, Sprite, Text} from 'pixi.js'
+import { Assets, Sprite, Text } from 'pixi.js'
 import cityData from '../city_data.json'
-import './store.js'
-import Alpine from 'alpinejs'
 import birdImage from './img/bird_hato.png'
 
 class Sprites {
@@ -15,7 +13,7 @@ class Sprites {
         await this.createBird()
         await this.createCities()
     }
-
+ 
     async createBird(){
         const birdTexture = await Assets.load(birdImage)
         const bird = Sprite.from(birdTexture)

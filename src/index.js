@@ -1,14 +1,17 @@
 import * as L from 'leaflet'
-import { Application, Ticker } from 'pixi.js'
+import { Application, Ticker, Assets, Sprite } from 'pixi.js'
 import 'leaflet-pixi-overlay'
 import { setupKeyboard } from './setupKeyboard.js'
 import { Sprites } from './sprites.js'
 import './store.js'
 import Alpine from 'alpinejs'
+import coolBirdImage from './img/cool_bird_hato.png'
+import discoBallImage from './img/mirror_ball.png'
 
-// 岩見沢市の位置
+// 岩見沢市の位置(?)
 const startLatLng = [43.11, 141.45]
-
+// Number of cities in Hokkaido 
+const numberOfCities = 1 // 35 + 129 + 15 = 179
 //　Making the map
 const mymap = L.map('mapid', { doubleClickZoom: false, keyboard: false }).setView(startLatLng, 11)
 L.tileLayer(
@@ -36,13 +39,15 @@ const cities = sprites.cities
 // Making pixi overlay
 // There's an option called "showRedrawOnMove" that redraws the pixi layer if the map moves
 // I'm not using because I want redraw to trigger when the bird moves, and the map to follow the bird
-const pixiOverlay = L.pixiOverlay(function (utils, event) {
+const pixiOverlay = L.pixiOverlay(async function (utils, event) {
   const container = utils.getContainer()
   const renderer = utils.getRenderer()
+  const project = utils.latLngToLayerPoint
+  const map = utils.getMap()
+  const scale = utils.getScale()
 
   // "camera" (map) moves if player moves
   if (event.type == 'move') {
-    const map = utils.getMap()
     const newCoords = utils.layerPointToLatLng([bird.x, bird.y])
     map.panTo(newCoords)
   }
@@ -53,10 +58,28 @@ const pixiOverlay = L.pixiOverlay(function (utils, event) {
     event.city.interactive = false
   }
 
+  if(event.type == 'add_disco_ball'){
+    const bounds = map.getBounds();
+    const center = bounds.getCenter();
+    const discoBallTexture = await Assets.load(discoBallImage)
+    const ball  = Sprite.from(discoBallTexture)
+    ball.anchor.set(0.5, 0.5)
+    container.addChild(ball);
+    const { x, y } = project([bounds.getNorth() - .04, center.lng]);
+    ball.x = x
+    ball.y = y
+    ball.scale.set(0.5 / scale)
+  }
+
+  if(event.type == 'happy_disco'){
+    // cycle background colors
+    // zoom map in and out
+    // bird walks back and forth
+    renderer.background.color = "rgba(148, 0, 211, 0.4)"
+  }
+
   // Place bird and city names on map
   if (firstDraw) {
-    const project = utils.latLngToLayerPoint
-    const scale = utils.getScale()
     bird.vx = bird.vy = 0
     const { x, y } = project(startLatLng)
     bird.x = x
@@ -78,10 +101,10 @@ const pixiOverlay = L.pixiOverlay(function (utils, event) {
 pixiOverlay.addTo(mymap)
 
 // Set up keyboard
-setupKeyboard(sprites.bird)
+const keys = setupKeyboard(sprites.bird)
 
-// Event listeners for the city
-// Changing text color, content does not work correctly  without calling pixiOverlay redraw
+// Event listeners for each city
+// Changing text color, content, etc does not work correctly without calling pixiOverlay redraw
 cities.forEach(city => {
   city.on('pointerdown', (event) => Alpine.store('UI').askQuestion(event.target, pixiOverlay))
 })
@@ -104,8 +127,29 @@ function play() {
     pixiOverlay.destroy();
   }
 
+  // win!
+  if(Alpine.store('UI').totalCorrect == numberOfCities){
+    Alpine.store('UI').totalCorrect = 0
+    getReadyForHappyDiscoMode()
+    happyDiscoMode()
+  }
+
   if (previousX != bird.x || previousY != bird.y) {
     // Redraw pixi overlay and move map if bird moved
     pixiOverlay.redraw({ type: 'move' })
   }
+}
+
+async function getReadyForHappyDiscoMode(){
+  Alpine.store('UI').resultWindow = false
+  keys.unsubscribeAll();
+ 
+  pixiOverlay.redraw({ type: "add_disco_ball" });
+  const coolBirdTexture = await Assets.load(coolBirdImage)
+  bird.texture = coolBirdTexture;
+  pixiOverlay.redraw({});
+}
+
+function happyDiscoMode(){
+  pixiOverlay.redraw({ type: "happy_disco" });
 }

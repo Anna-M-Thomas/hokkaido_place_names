@@ -10,6 +10,7 @@ Alpine.store('UI', {
   pron: "",
   answer: '',
   correct: false,
+  totalCorrect: 0,
   score:  new Score(0),
   health: new Health(10),
   checkAnswer() {
@@ -17,6 +18,7 @@ Alpine.store('UI', {
     this.questionWindow = false
     if (this.answer == this.pron) {
       this.correct = true
+      this.totalCorrect++
       this.score.increment()
       this.health.increment()
       this.pixiOverlay.redraw({type: "correct_city", city: this.city})

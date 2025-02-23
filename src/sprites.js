@@ -1,39 +1,43 @@
 import { Assets, Sprite, Text } from 'pixi.js'
 import cityData from '../city_data.json'
 import birdImage from './img/bird_hato.png'
-
-class Sprites {
-    constructor(container){        
-        this.container = container
-        this.bird = null;
-        this.cities = [];
-    }
-
-    async initialize(){
-        await this.createBird()
-        await this.createCities()
-    }
+import coolBirdImage from './img/cool_bird_hato.png'
+import discoBallImage from './img/mirror_ball.png'
  
-    async createBird(){
-        const birdTexture = await Assets.load(birdImage)
-        const bird = Sprite.from(birdTexture)
-        bird.anchor.set(0.5, 0.5)
-        bird.zIndex = 1
-        this.container.addChild(bird)
-        this.bird = bird
+async function createBird(container){
+    const birdTexture = await Assets.load(birdImage)
+    const bird = Sprite.from(birdTexture)
+    bird.anchor.set(0.5, 0.5)
+    bird.vx = bird.vy = 0
+    bird.zIndex = 1
+    container.addChild(bird)
+    bird.enterCoolMode = async function() {
+        const coolBirdTexture = await Assets.load(coolBirdImage)
+        this.texture = coolBirdTexture;
     }
-
-    async createCities(){
-        cityData.forEach(city => {
-          const cityText = new Text(city.city_name)
-          cityText.anchor.set(0.5, 0.5)
-          cityText.data = city
-          cityText.interactive = true
-          cityText.cursor = 'pointer'
-          this.container.addChild(cityText)
-          this.cities.push(cityText)
-        })
-    }
+    return bird
 }
 
-export { Sprites }
+async function createCities(container){
+    const cities = []
+    cityData.forEach(city => {
+        const cityText = new Text(city.city_name)
+        cityText.anchor.set(0.5, 0.5)
+        cityText.data = city
+        cityText.interactive = true
+        cityText.cursor = 'pointer'
+        container.addChild(cityText)
+        cities.push(cityText)
+    })
+    return cities
+}
+
+async function createDiscoBall(container){
+    const discoBallTexture = await Assets.load(discoBallImage)
+    const ball  = Sprite.from(discoBallTexture)
+    ball.anchor.set(0.5, 0.5)
+    container.addChild(ball);
+    return ball
+}
+
+export { createBird, createCities, createDiscoBall }

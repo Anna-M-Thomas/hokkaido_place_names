@@ -8,13 +8,16 @@ import Alpine from 'alpinejs'
 
 // 岩見沢市の位置(?)
 const startLatLng = [43.11, 141.45]
-// Number of cities in Hokkaido 
+// Number of cities in Hokkaido
 const numberOfCities = 1 // 35 + 129 + 15 = 179
-let zoom = 11;
+let zoom = 11
 //　Making the map
-const mymap = L.map('mapid', { 
-  doubleClickZoom: false, keyboard: false, 
-  zoomControl: false, scrollWheelZoom: false, touchZoom: false 
+const mymap = L.map('mapid', {
+  doubleClickZoom: false,
+  keyboard: false,
+  zoomControl: false,
+  scrollWheelZoom: false,
+  touchZoom: false,
 }).setView(startLatLng, zoom)
 L.tileLayer(
   'https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}{r}.png',
@@ -36,7 +39,6 @@ app.stage.sortableChildren = true
 const bird = await createBird(app.stage)
 const cities = await createCities(app.stage)
 
-
 // Making pixi overlay
 // There's an option called "showRedrawOnMove" that redraws the pixi layer if the map moves
 // I'm not using because I want redraw to trigger when the bird moves, and the map to follow the bird
@@ -46,7 +48,6 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
   const project = utils.latLngToLayerPoint
   const map = utils.getMap()
   const scale = utils.getScale()
-
 
   // Place bird and city names on map
   if (firstDraw) {
@@ -63,7 +64,7 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
     firstDraw = false
   }
 
-  switch(event.type){
+  switch (event.type) {
     // "camera" (map) moves if player moves
     case 'move':
       const newCoords = utils.layerPointToLatLng([bird.x, bird.y])
@@ -71,14 +72,14 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
       break
     // Change city's color and remove interactivity when it was correctly answered
     case 'correct_city':
-      event.city.style.fill = "#87CEEB"
+      event.city.style.fill = '#87CEEB'
       event.city.interactive = false
       break
     // Place disco ball at map top center
     case 'disco_ball':
-      const bounds = map.getBounds();
-      const center = bounds.getCenter();
-      const { x, y } = project([bounds.getNorth() - .04, center.lng]);
+      const bounds = map.getBounds()
+      const center = bounds.getCenter()
+      const { x, y } = project([bounds.getNorth() - 0.04, center.lng])
       event.ball.x = x
       event.ball.y = y
       event.ball.scale.set(0.5 / scale)
@@ -88,14 +89,14 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
       // cycle background colors: I want to do that in here, but have a helper switching colors
       // zoom map in and out: I want to do that in here, alternate zoom in and out (helper)
       zoom = zoom == 11 ? 12 : 11
-      map.setZoom(zoom, {animate: true })
+      map.setZoom(zoom, { animate: true })
       break
     default:
     // Do nothing
   }
-  
+
   renderer.render(container)
-}, app.stage) 
+}, app.stage)
 
 //Put pixi overlay on map
 pixiOverlay.addTo(mymap)
@@ -105,7 +106,9 @@ const keys = setupKeyboard(bird)
 
 // Event listeners for each city
 cities.forEach(city => {
-  city.on('pointerdown', (event) => Alpine.store('UI').askQuestion(event.target, pixiOverlay))
+  city.on('pointerdown', event =>
+    Alpine.store('UI').askQuestion(event.target, pixiOverlay)
+  )
 })
 
 // Start the game loop
@@ -123,19 +126,19 @@ function play() {
   bird.y += bird.vy
 
   // Out of health, game ends
-  if(Alpine.store('UI').health.isNegativeHealth()){
-    pixiOverlay.destroy();
+  if (Alpine.store('UI').health.isNegativeHealth()) {
+    pixiOverlay.destroy()
   }
 
   // win!
-  if(Alpine.store('UI').totalCorrect == numberOfCities){
+  if (Alpine.store('UI').totalCorrect == numberOfCities) {
     Alpine.store('UI').totalCorrect = 0
     getReadyForHappyDiscoMode()
   }
   // The ticker is too fast for zooming map in and out during finale screen
-  if(discoTimes > 0){
-    if(discoTimes % 10 == 0){
-      pixiOverlay.redraw({ type: "happy_disco_mode" });
+  if (discoTimes > 0) {
+    if (discoTimes % 10 == 0) {
+      pixiOverlay.redraw({ type: 'happy_disco_mode' })
     }
     discoTimes--
   }
@@ -146,12 +149,12 @@ function play() {
   }
 }
 
-async function getReadyForHappyDiscoMode(){
+async function getReadyForHappyDiscoMode() {
   Alpine.store('UI').resultWindow = false
-  keys.unsubscribeAll();
-  const ball = await createDiscoBall(app.stage);
-  pixiOverlay.redraw({ type: "disco_ball", ball: ball});
-  await bird.enterCoolMode();
-  pixiOverlay.redraw({});
+  keys.unsubscribeAll()
+  const ball = await createDiscoBall(app.stage)
+  pixiOverlay.redraw({ type: 'disco_ball', ball: ball })
+  await bird.enterCoolMode()
+  pixiOverlay.redraw({})
   discoTimes = 300
 }

@@ -3,7 +3,7 @@
         width: 700px;
       }
       .ui {
-        border: 2px solid rgba(0,0,0,0.2);
+        border: 2px solid rgba(0, 0, 0, 0.2);
         font-size: 1rem;
         background: white;
         z-index: 1000;
@@ -29,5 +29,5 @@
         top: 10px;
       }
       [x-cloak] {
-        display: none !important; 
-      }</style><script defer="defer" src="main.js"></script></head><body><div x-data id="mapid"><div class="top-bar ui"><div x-show="$store.UI.health.value >= 0">&#128151; <span x-text="$store.UI.health.value"></span><br/>スコア: <span x-text="$store.UI.score.value"></span></div><div x-show="$store.UI.health.value < 0">GAME OVER</div></div><div class="window ui" x-show="$store.UI.questionWindow" x-cloak><span role="button" class="close-button" @click="$store.UI.questionWindow = false;">X</span><p><span x-text="$store.UI.cityName"></span>の発音は？</p><input placeholder="ひらがなで答えてください" x-model="$store.UI.answer"> <button @click="$store.UI.checkAnswer()">答える</button></div><div class="window ui" x-data x-show="$store.UI.resultWindow" x-cloak><span role="button" class="close-button" @click="$store.UI.resultWindow = false">X</span><p><span x-text="$store.UI.correct ? '正解！' : '残念！'"></span><br/><span x-text="$store.UI.cityName"></span>の発音は<span x-text="$store.UI.cityPron"></span>!</p></div></div><script src="main.js"></script></body></html>
+        display: none !important;
+      }</style><script defer="defer" src="main.js"></script></head><body><div x-data id="mapid"><div class="top-bar ui"><div x-show="$store.UI.health.value >= 0">&#128151; <span x-text="$store.UI.health.value"></span><br/>スコア: <span x-text="$store.UI.score.value"></span></div><div x-show="$store.UI.health.value < 0">GAME OVER</div></div><div class="window ui" x-show="$store.UI.questionWindow" x-cloak><span role="button" class="close-button" @click="$store.UI.questionWindow = false;">X</span><p><span x-text="$store.UI.name"></span>の読み方は？</p><input placeholder="ひらがなで答えてください" x-model="$store.UI.answer"/> <button @click="$store.UI.checkAnswer()">答える</button></div><div class="window ui" x-data x-show="$store.UI.resultWindow" x-cloak><span role="button" class="close-button" @click="$store.UI.resultWindow = false">X</span><p><span x-text="$store.UI.correct ? '正解！' : '残念！'"></span><br/><span x-text="$store.UI.name"></span>の読み方は<span x-text="$store.UI.pron"></span>!</p></div></div><script src="main.js"></script></body></html>

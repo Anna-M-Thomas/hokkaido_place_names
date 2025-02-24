@@ -31,7 +31,7 @@ Alpine.store('UI', {
   askQuestion(city, pixiOverlay) {
     this.pixiOverlay = pixiOverlay
     this.questionWindow = true
-    // I know this is くどい to save all of these but it's easier to write out in index.html and in here
+    // index.html, store.jsで書きやすくしたいためcityと別途に名前と読み方も保存
     this.city = city
     this.name = city.data.city_name
     this.pron = city.data.pron

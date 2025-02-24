@@ -1,19 +1,19 @@
 import * as L from 'leaflet'
-import { Application, Ticker, Assets, Sprite } from 'pixi.js'
+import { Application, Ticker } from 'pixi.js'
 import 'leaflet-pixi-overlay'
 import { setupKeyboard } from './setupKeyboard.js'
 import { createBird, createCities, createDiscoBall } from './sprites.js'
-import { ColorHelper} from './colorHelper.js'
+import { ColorHelper } from './colorHelper.js'
 import './store.js'
 import Alpine from 'alpinejs'
 
-// 岩見沢市の位置(?)
+// 岩見沢市の位置
 const startLatLng = [43.19617, 141.77589]
-// Number of cities in Hokkaido
-const numberOfCities = 1 // 35 + 129 + 15 = 179
+// 北海道は179市町村
+const numberOfCities = 179
 let currentZoom = 11
 
-//　Making the map
+// 地図生成
 const mymap = L.map('mapid', {
   doubleClickZoom: false,
   keyboard: false,
@@ -35,17 +35,15 @@ L.tileLayer(
 ).addTo(mymap)
 
 let firstDraw = true
-// Used for counter during finale
-let discoTimes = 0
-const colorHelper = new ColorHelper();
 const app = new Application()
 app.stage.sortableChildren = true
 const bird = await createBird(app.stage)
 const cities = await createCities(app.stage)
+// 祝いモード関連
+let discoTimes = 0
+const colorHelper = new ColorHelper()
 
-// Making pixi overlay
-// There's an option called "showRedrawOnMove" that redraws the pixi layer if the map moves
-// I'm not using because I want redraw to trigger when the bird moves, and the map to follow the bird
+// pixiOverlay生成
 const pixiOverlay = L.pixiOverlay(async function (utils, event) {
   const container = utils.getContainer()
   const renderer = utils.getRenderer()
@@ -53,7 +51,7 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
   const map = utils.getMap()
   const scale = utils.getScale()
 
-  // Place bird and city names on map
+  // render初回は、鳩と視聴村名を地図上で配置したいところへ
   if (firstDraw) {
     const { x, y } = project(startLatLng)
     bird.x = x
@@ -69,17 +67,17 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
   }
 
   switch (event.type) {
-    // "camera" (map) moves if player moves
+    // 鳩が動いたら地図が動きを追う
     case 'move':
       const newCoords = utils.layerPointToLatLng([bird.x, bird.y])
       map.panTo(newCoords)
       break
-    // Change city's color and remove interactivity when it was correctly answered
+    // 市町村の読み方当たったら、色を変更、クリックに反応しなくする
     case 'correct_city':
-      event.city.style.fill = '#87CEEB'
+      event.city.style.fill = '#87CEEB' // light blue
       event.city.interactive = false
       break
-    // Place disco ball at map top center
+    // ミラーボールを地図の上中央に配置
     case 'disco_ball':
       const bounds = map.getBounds()
       const center = bounds.getCenter()
@@ -88,7 +86,7 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
       event.ball.y = y
       event.ball.scale.set(0.5 / scale)
       break
-    // Game finale
+    // 勝った時の祝いモード
     case 'happy_disco_mode':
       currentZoom = currentZoom == 12 ? 11 : 12
       map.setZoom(currentZoom, { animate: false })
@@ -102,23 +100,19 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
   renderer.render(container)
 }, app.stage)
 
-//Put pixi overlay on map
 pixiOverlay.addTo(mymap)
 
-// Set up keyboard
 const keys = setupKeyboard(bird)
 
-// Event listeners for each city
+// 市町村名をクリックした時、読み方を聞く
 cities.forEach(city => {
   city.on('pointerdown', event =>
     Alpine.store('UI').askQuestion(event.target, pixiOverlay)
   )
 })
 
-// Start the game loop
 Ticker.shared.add(delta => gameLoop(delta))
 
-//　Update the current game state
 function gameLoop(delta) {
   play(delta)
 }
@@ -129,17 +123,18 @@ function play() {
   bird.x += bird.vx
   bird.y += bird.vy
 
-  // Out of health, game ends
+  // ライフポイントが０以下になったらゲーム終了
   if (Alpine.store('UI').health.isNegativeHealth()) {
     pixiOverlay.destroy()
   }
 
-  // win!
+  // すべての市町村を読めたらゲームに勝つ
   if (Alpine.store('UI').totalCorrect == numberOfCities) {
     Alpine.store('UI').totalCorrect = 0
     getReadyForHappyDiscoMode()
   }
-  // The ticker is too fast for zooming map in and out during finale screen
+  // 勝った時の祝いモード中。
+  // Ticker(描画のタイマー)通りだとタイミングが早すぎる、呼ぶ回数を減らす
   if (discoTimes > 0) {
     if (discoTimes % 25 == 0) {
       pixiOverlay.redraw({ type: 'happy_disco_mode' })
@@ -147,15 +142,19 @@ function play() {
     discoTimes--
   }
 
+  // 鳩が動いたら、描画
   if (previousX != bird.x || previousY != bird.y) {
-    // Redraw pixi overlay and move map if bird moved
     pixiOverlay.redraw({ type: 'move' })
   }
 }
 
+// 祝いモード前の準備
 async function getReadyForHappyDiscoMode() {
   Alpine.store('UI').resultWindow = false
   keys.unsubscribeAll()
+  alert(
+    'Congratulations!\nYou will now enter HAPPY DISCO MODE.\nThere are flashing effects!\nおめでとうございます！\nハッピーディスコモードに入ります。\nピカピカするのでご注意ください！'
+  )
   const ball = await createDiscoBall(app.stage)
   pixiOverlay.redraw({ type: 'disco_ball', ball: ball })
   await bird.enterCoolMode()

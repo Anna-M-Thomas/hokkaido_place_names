@@ -3,14 +3,16 @@ import { Application, Ticker, Assets, Sprite } from 'pixi.js'
 import 'leaflet-pixi-overlay'
 import { setupKeyboard } from './setupKeyboard.js'
 import { createBird, createCities, createDiscoBall } from './sprites.js'
+import { ColorHelper} from './colorHelper.js'
 import './store.js'
 import Alpine from 'alpinejs'
 
 // 岩見沢市の位置(?)
-const startLatLng = [43.11, 141.45]
+const startLatLng = [43.19617, 141.77589]
 // Number of cities in Hokkaido
 const numberOfCities = 1 // 35 + 129 + 15 = 179
-let zoom = 11
+let currentZoom = 11
+
 //　Making the map
 const mymap = L.map('mapid', {
   doubleClickZoom: false,
@@ -18,7 +20,8 @@ const mymap = L.map('mapid', {
   zoomControl: false,
   scrollWheelZoom: false,
   touchZoom: false,
-}).setView(startLatLng, zoom)
+}).setView(startLatLng, currentZoom)
+
 L.tileLayer(
   'https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}{r}.png',
   {
@@ -34,6 +37,7 @@ L.tileLayer(
 let firstDraw = true
 // Used for counter during finale
 let discoTimes = 0
+const colorHelper = new ColorHelper();
 const app = new Application()
 app.stage.sortableChildren = true
 const bird = await createBird(app.stage)
@@ -86,10 +90,10 @@ const pixiOverlay = L.pixiOverlay(async function (utils, event) {
       break
     // Game finale
     case 'happy_disco_mode':
-      // cycle background colors: I want to do that in here, but have a helper switching colors
-      // zoom map in and out: I want to do that in here, alternate zoom in and out (helper)
-      zoom = zoom == 11 ? 12 : 11
-      map.setZoom(zoom, { animate: true })
+      currentZoom = currentZoom == 12 ? 11 : 12
+      map.setZoom(currentZoom, { animate: false })
+      renderer.background.color = colorHelper.getNextColor()
+      bird.dance()
       break
     default:
     // Do nothing
@@ -137,7 +141,7 @@ function play() {
   }
   // The ticker is too fast for zooming map in and out during finale screen
   if (discoTimes > 0) {
-    if (discoTimes % 10 == 0) {
+    if (discoTimes % 25 == 0) {
       pixiOverlay.redraw({ type: 'happy_disco_mode' })
     }
     discoTimes--
@@ -156,5 +160,5 @@ async function getReadyForHappyDiscoMode() {
   pixiOverlay.redraw({ type: 'disco_ball', ball: ball })
   await bird.enterCoolMode()
   pixiOverlay.redraw({})
-  discoTimes = 300
+  discoTimes = 1500
 }

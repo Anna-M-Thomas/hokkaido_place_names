@@ -15,6 +15,9 @@ async function createBird(container) {
     const coolBirdTexture = await Assets.load(coolBirdImage)
     this.texture = coolBirdTexture
   }
+  bird.dance = function () {
+    this.scale.x *= -1
+  }
   return bird
 }
 

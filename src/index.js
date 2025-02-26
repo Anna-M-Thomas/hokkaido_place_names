@@ -6,6 +6,7 @@ import { createBird, createCities, createDiscoBall } from './sprites.js'
 import { ColorHelper } from './colorHelper.js'
 import './store.js'
 import Alpine from 'alpinejs'
+import './css/style.css';
 
 // 岩見沢市の位置
 const startLatLng = [43.19617, 141.77589]
